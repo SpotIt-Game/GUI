@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Game from "./pages/Game";
 import Difficulty from "./pages/Difficulty";
+import { Route, Routes } from "react-router-dom"
 
 
 import { useState, useEffect } from "react";
@@ -32,10 +33,14 @@ function App() {
     <>
 
       <Nav></Nav>
-      <Component></Component>
-
-      {/* <Card gallery={array[13]} styling={-50}></Card>
-      <Card gallery={array[12]} styling={300}></Card> */}
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/difficulty" element={<Difficulty />} />
+          <Route path="/game" element={<Game />} />
+        </Routes>
+      </div>
 
     </>
   )
