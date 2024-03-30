@@ -7,7 +7,7 @@ function Game(){
     const [data, setData] = useState(null); // Declare state variable and its setter function
     const [loading, setLoading] = useState(true);
     useEffect(() =>{
-      const apiUrl = 'http://localhost:8080/cards';
+      const apiUrl = 'https://q3cgus21cj.execute-api.us-east-2.amazonaws.com/dev';
       fetch(apiUrl)
         .then(response => {
           if (!response.ok) {
