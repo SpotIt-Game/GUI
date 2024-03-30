@@ -67,7 +67,7 @@ function Game(){
       array[arr[i].id_card].info.push(temp)
     }
 
-    let fours = array.slice(1, 13)
+    let fours = array.slice(390 - 73, 390)
 
     fours = fours.sort(() => Math.random() - 0.5)
 
