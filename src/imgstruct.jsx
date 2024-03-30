@@ -14,8 +14,8 @@ class imgStruct {
             position: 'absolute',
             width: `${this.width * Math.sqrt(this.scale)}px`,
             // height: `${this.height * Math.sqrt(this.scale)}px`, // Adjusted to include height
-            top: `${this.y + 200 - (this.height * Math.sqrt(this.scale)) / 2}px`, // Adjusted to center vertically
-            left: `${this.x + 200 - (this.width * Math.sqrt(this.scale)) / 2}px`, // Adjusted to center horizontally
+            top: `${this.y + 240 - (this.height * Math.sqrt(this.scale)) / 2}px`, // Adjusted to center vertically
+            left: `${this.x + 240 - (this.width * Math.sqrt(this.scale)) / 2}px`, // Adjusted to center horizontally
             transformOrigin: `top left`,
             transform: `rotate(${this.rotation}rad)`,
         };
