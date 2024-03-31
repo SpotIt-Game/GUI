@@ -76,19 +76,25 @@ function Game(){
   
   
 
-
+    let pre = ""
 
     
-    const increment = () => {
-        console.log("Hello", a, b)
-        setA(prevA => prevA + 1)
-        setB(prevB => prevB + 1)
+    const verificador = (link) => {
+        if(link == pre){
+            setA(prevA => prevA + 1)
+            setB(prevB => prevB + 1)
+        }
+        pre = ""
+    }
+
+    const setPre = (link) => {
+        pre = link
     }
 
     return(
         <>
-            <Card gallery={segment[a]} onButtonClick={() => increment()} className="center" styling={-50}></Card>
-            <Card gallery={segment[b]} className="jugador" styling={-50}></Card>
+            <Card gallery={segment[a]} onButtonClick={verificador} className="center" styling={-50}></Card>
+            <Card gallery={segment[b]} className="jugador" onButtonClick={setPre} styling={-50}></Card>
             <p className="player"> Player Card </p>
         </>
     )

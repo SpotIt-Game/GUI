@@ -30,8 +30,12 @@ function Card(props){
 
       }
 
+    const handler = (link) => {
+        onButtonClick(link)
+    }
+
     const galleryItems = imgs.map(icon => 
-        <button style={styler} onClick={onButtonClick} >
+        <button style={styler} onClick={() => handler(icon.url)} >
             <img src={icon.url} style={icon.styler}></img>
         </button>
     )
