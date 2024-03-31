@@ -3,6 +3,7 @@ import imgStruct from "./imgstruct"
 
 function Card(props){
     const imgs = props.gallery.info
+    const { onButtonClick } = props
 
     const styler = {
 
@@ -30,10 +31,10 @@ function Card(props){
       }
 
     const galleryItems = imgs.map(icon => 
-        <button style={styler} onClick={()=> console.log(icon.url)}>
+        <button style={styler} onClick={onButtonClick} >
             <img src={icon.url} style={icon.styler}></img>
         </button>
-)
+    )
 
 
     return(
