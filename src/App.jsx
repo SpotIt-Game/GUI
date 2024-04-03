@@ -15,19 +15,6 @@ function App() {
 
   let Component
 
-  switch (window.location.pathname) {
-    case "/":
-      Component = Home
-      break;
-    case '/about':
-      Component = About
-      break;
-    case '/game':
-      Component = Game
-      break
-    case '/difficulty':
-      Component = Difficulty
-  }
 
   return (
     <>
