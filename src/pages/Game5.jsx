@@ -3,7 +3,7 @@ import CardClass from "../cardClass";
 import imgStruct from "../imgstruct";
 import React, { useState, useEffect } from 'react';
 
-function Game(){
+function Game5(){
     const [a, setA] = useState(1)
     const [b, setB] = useState(0)    
     const [data, setData] = useState(null); // Declare state variable and its setter function
@@ -34,7 +34,7 @@ function Game(){
                 array[arr[i].id_card].info.push(temp)
             }
 
-            let fours = array.slice(318, 390)
+            let fours = array.slice(14, 34)
 
             fours = fours.sort(() => Math.random() - 0.5)
 
@@ -91,13 +91,21 @@ function Game(){
         pre = link
     }
 
+
     return(
+        
         <>
-            <Card gallery={segment[a]} onButtonClick={verificador} className="center" styling={-50}></Card>
-            <Card gallery={segment[b]} className="jugador" onButtonClick={setPre} styling={-50}></Card>
-            <p className="player"> Player Card </p>
+            <ul className="gameList">
+                <li>
+                    <Card gallery={segment[a]} onButtonClick={verificador} className="center"></Card>
+                </li>
+                <li>
+                    <Card gallery={segment[b]} className="jugador" onButtonClick={setPre}></Card>
+                    <p className="player"> Player Card </p>
+                </li>
+            </ul>
         </>
     )
 }
 
-export default Game
+export default Game5

@@ -24,9 +24,9 @@ function Card(props){
         borderRadius: `50%`,
         position: `relative`,
         top: `${props.styling}px`,
-        margin: `0 auto`,
+        margin: `50px`,
         backgroundColor: `rgb(230, 230, 230)`,
-        transform: `scale(0.68)`,
+        transform: `scale(1)`,
 
       }
 

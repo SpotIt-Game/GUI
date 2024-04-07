@@ -134,10 +134,11 @@ body{
   display: flex;
   list-style: none;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .homelist li{
-  margin-right: 40px;
+  margin: 20px;
   cursor: pointer;
 }
 
@@ -159,7 +160,7 @@ body{
 .player{
   font-family: "Boink Drop Shadow W01";
   position: relative;
-  top: -100px;
+  top: -40px;
   text-align: center;
   color: hsl(56, 100%, 50%);
 }
@@ -179,6 +180,15 @@ body{
   height: 420px;
   border-radius: 50%;
   padding: 0rem;
+}
+
+.gameList {
+        display: flex; 
+        position: relative;
+        top: 50px;
+        list-style: none;
+        justify-content: center;
+        flex-wrap: wrap;
 }
 
 @keyframes float {
