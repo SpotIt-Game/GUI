@@ -82,7 +82,6 @@ function Waiting(){
                     return
                 }
             })
-            addLobby()
         }
         catch(error){
             console.error("Error going over lobbies", error)
