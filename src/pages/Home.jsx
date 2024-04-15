@@ -1,5 +1,6 @@
-import BackCS from "../BackCS"
-import BackLang from "../BackLang"
+import BackCS from "../components/BackCS"
+import BackLang from "../components/BackLang"
+
 
 function Home(){
     const styler = {

@@ -1,6 +1,6 @@
-import Card from "../Card";
-import CardClass from "../cardClass";
-import imgStruct from "../imgstruct";
+import Card from "../components/Card";
+import CardClass from "../components/cardClass";
+import imgStruct from "../components/imgstruct";
 import React, { useState, useEffect } from 'react';
 
 function Game8(){

@@ -1,4 +1,4 @@
-import PlainCard from "../PlainCard"
+import PlainCard from "../components/PlainCard"
 
 function Difficulty(){
 
@@ -16,7 +16,7 @@ function Difficulty(){
             <h1 style={styler}>Choose Difficulty</h1>
             <ul className="diflist">
                 <li>
-                    <PlainCard text={"4"} page="/game4"></PlainCard>
+                    <PlainCard text={"4"} page="/wait"></PlainCard>
                 </li>
                 <li>
                     <PlainCard text="5" page="/game5"/>

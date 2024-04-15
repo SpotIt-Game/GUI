@@ -1,5 +1,6 @@
-import Card from "./Card"
-import Nav from "./Nav";
+
+import Landing from "./pages/Landing";
+import Nav from "./components/Nav";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Game9 from "./pages/Game9";
@@ -8,16 +9,12 @@ import Game5 from "./pages/Game5.jsx";
 import Game6 from "./pages/Game6.jsx";
 import Game8 from "./pages/Game8.jsx"
 import Difficulty from "./pages/Difficulty";
+import Auth from "./components/Auth" 
+import Waiting from "./pages/Waiting"
 import { Route, Routes } from "react-router-dom"
 
 
-import { useState, useEffect } from "react";
-import imgStruct from "./imgstruct"
-import CardClass from "./cardClass"
-
 function App() {
-
-  let Component
 
 
   return (
@@ -26,10 +23,13 @@ function App() {
       <Nav></Nav>
       <div className="container">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/wait" element={<Waiting />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/about" element={<About />} />
           <Route path="/difficulty" element={<Difficulty />} />
-          <Route path="/game4" element = {<Game4 />} />
+          <Route path="/game4/:lowkey" element={<Game4 />} />
           <Route path="/game5" element = {<Game5 />} />
           <Route path="/game6" element = {<Game6 />} />
           <Route path="/game8" element = {<Game8 />} />
