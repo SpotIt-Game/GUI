@@ -220,6 +220,12 @@ function Game4(){
                 setWinner(childSnap.val())
             }
         })
+        try{
+            await remove(refer)
+        }
+        catch(error){
+            console.error(error)
+        }
     }
 
     if(a == 12){
