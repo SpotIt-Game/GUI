@@ -8,6 +8,7 @@ import { useState } from "react";
 
 function Waiting(){
     let pathKey = ""
+    let rando = 0
     const [inLobby, setInLobby] = useState(false)
     const [LobbyKey, setLobbyKey] = useState("testing...")
     let checker = false
@@ -24,9 +25,12 @@ function Waiting(){
         setLobbyKey(newLobby1Ref.key)
         pathKey = newLobby1Ref.key
         console.log(pathKey)
+        rando = Math.random()
+        rando = Math.floor(rando * (1000000)) + 1
         await set(newLobby1Ref, {
             start: false,
-            turn: 2
+            turn: 1,
+            srtFact: rando
         })
         addPlayerToLobby(`/lobbies/4s/${newLobby1Ref.key}`)
         setInLobby(true)
@@ -50,7 +54,8 @@ function Waiting(){
         try{
             await update(refer, {
                 [auth.currentUser.uid]: {
-                    points: 0
+                    points: 0,
+                    name: auth.currentUser.uid
                 } 
             })
             listenToStart(path, goToGame)
@@ -59,7 +64,7 @@ function Waiting(){
             console.error(error)
         }
         try{
-            if((await get(refer)).size === 4){
+            if((await get(refer)).size === 5){
                 startGame(path)
             }
         }
@@ -76,6 +81,7 @@ function Waiting(){
                 if(childSnapshot.val().start == false){
                     setLobbyKey(childSnapshot.key)
                     pathKey = childSnapshot.key
+                    rando = childSnapshot.val().srtFact
                     console.log(pathKey)
                     addPlayerToLobby(`/${NodeDir}/${childSnapshot.key}`, snapshot.size)
                     setInLobby(true)
@@ -129,7 +135,7 @@ function Waiting(){
 
     const goToGame = () => {
         console.log(pathKey)
-        const url = `/game4/${pathKey}`
+        const url = `/game4/${pathKey}/${rando}`
         console.log(url)
         window.location.href = url;
     };

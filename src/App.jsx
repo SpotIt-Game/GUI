@@ -29,7 +29,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/about" element={<About />} />
           <Route path="/difficulty" element={<Difficulty />} />
-          <Route path="/game4/:lowkey" element={<Game4 />} />
+          <Route path="/game4/:lowkey/:rand" element={<Game4 />} />
           <Route path="/game5" element = {<Game5 />} />
           <Route path="/game6" element = {<Game6 />} />
           <Route path="/game8" element = {<Game8 />} />
