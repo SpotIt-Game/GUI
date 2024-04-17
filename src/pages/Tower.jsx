@@ -9,17 +9,59 @@ import { child, ref, onValue, set, query, get, remove, update, push, runTransact
 import { rt } from "../firebase/config"
 import { useParams } from "react-router-dom";
 import seedrandom from "seedrandom";
-function Game4(){
+function Tower(){
     const [data, setData] = useState(null); // Declare state variable and its setter function
     const [loading, setLoading] = useState(true);
     const [segment, setSegment] = useState([]);
     const image_cardCollectionRef = collection(db, "image_card")
     const [a, setA] = useState(1);
     const [b, setB] = useState(0);
-    const { lowkey, rand } = useParams();
+    const { lowkey, rand, edition,  lvl } = useParams();
     const [t, setT] = useState(0)
     const [winner, setWinner] = useState({points: 0, name: ""})
-
+    let start = 0;
+    let end = 0;
+    if(lvl == 4 && edition == 'cs'){
+        start = 1;
+        end = 13;
+    }
+    else if(lvl == 5 && edition == 'cs'){
+        start = 14;
+        end = 34;
+    }
+    else if(lvl == 6 && edition == 'cs'){
+        start = 35;
+        end = 65;
+    }
+    else if(lvl == 8 && edition == 'cs'){
+        start = 66;
+        end = 122; 
+    }
+    else if(lvl == 9 && edition == 'cs'){
+        start = 123;
+        end = 196;
+    }
+    else if(lvl == 4 && edition == 'lang'){
+        start = 196;
+        end = 208;
+    }
+    else if(lvl == 5 && edition == 'lang'){
+        start = 209;
+        end = 229;
+    }
+    else if(lvl == 6 && edition == 'lang'){
+        start = 230;
+        end = 260;
+    }
+    else if(lvl == 8 && edition == 'lang'){
+        start = 261;
+        end = 317;
+    }
+    else if(lvl == 9 && edition == 'lang'){
+        start = 318;
+        end = 390;
+    }
+    console.log("This is the edition", edition)
     useEffect(() =>{
         const apiUrl = 'https://q3cgus21cj.execute-api.us-east-2.amazonaws.com/dev';
         fetch(apiUrl)
@@ -45,7 +87,7 @@ function Game4(){
                   array[arr[i].id_card].info.push(temp)
               }
   
-              let fours = array.slice(1, 13)
+              let fours = array.slice(start, end)
 
               const rng = seedrandom(rand)
 
@@ -75,46 +117,6 @@ function Game4(){
     useEffect(() => {
         console.log(a, "This is the value of A")
     }, [a])
-
-    // useEffect(() => {
-    //     const fillDeck = async () => {
-
-    //         console.log(data, "this is the data")
-    //         data.map(async (photo) => {
-    //             try{
-    //                 await addDoc(image_cardCollectionRef, {
-    //                     id_card: photo.id_card,
-    //                     height: photo.height,
-    //                     rotate: photo.rotate,
-    //                     scale: photo.scale,
-    //                     url: photo.url,
-    //                     width: photo.width,
-    //                     x: photo.x,
-    //                     y: photo.y
-    //                 })
-    //             }
-    //             catch(error){
-    //                 console.error("this doesn't work", error)
-    //             }
-    //         })
-    //     }
-    //     getDocs(image_cardCollectionRef)
-    //         .then((querySnapshot) => {
-    //             const pre = querySnapshot.docs.map((doc) => ({
-    //                 ...doc.data()
-    //             }))
-    //             if (pre.length > 0) {
-    //                 console.log("Collection exists and has documents.");
-    //             } else {
-    //                 fillDeck();
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         console.error("Error checking collection existence:", error);
-    //     });
-    // }, [data])
-
-
 
 
 
@@ -146,7 +148,7 @@ function Game4(){
     let pre = ""
 
     const addPoints = async () => {
-        const refer = ref(rt, `/lobbies/4s/${lowkey}/${auth.currentUser.uid}/points`)
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/${lowkey}/${auth.currentUser.uid}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(lowkey)
@@ -172,12 +174,12 @@ function Game4(){
         })
     }
 
-    listenToTurn(`lobbies/4s/${lowkey}`, async () => {
+    listenToTurn(`lobbies/${edition}/${lvl}s/${lowkey}`, async () => {
         console.log(a, "this is the value of A")
     })
 
     const nextTurn = async () => {
-        const refer = ref(rt, `lobbies/4s/${lowkey}/turn`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/${lowkey}/turn`)
         try{
             await runTransaction(refer, (currentData) => {
                 return currentData + 1
@@ -213,7 +215,7 @@ function Game4(){
       });
 
     const findWinner = async () => {
-        const refer = ref(rt, `lobbies/4s/${lowkey}`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/${lowkey}`)
         const snapshot = await get(refer)
         snapshot.forEach((childSnap) => {
             if(childSnap.val().points > winner.points){
@@ -228,7 +230,7 @@ function Game4(){
         }
     }
 
-    if(a == 12){
+    if(a == end - start){
         findWinner()
         return(
             <>
@@ -252,4 +254,4 @@ function Game4(){
     )
 }
 
-export default Game4
+export default Tower

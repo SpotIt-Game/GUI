@@ -4,7 +4,7 @@ import Nav from "./components/Nav";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Game9 from "./pages/Game9";
-import Game4 from "./pages/Game4.jsx";
+import Tower from "./pages/Tower.jsx"
 import Game5 from "./pages/Game5.jsx";
 import Game6 from "./pages/Game6.jsx";
 import Game8 from "./pages/Game8.jsx"
@@ -25,15 +25,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/wait/:diff" element={<Waiting />} />
+          <Route path="/wait/:diff/:edition" element={<Waiting />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/about" element={<About />} />
-          <Route path="/difficulty" element={<Difficulty />} />
-          <Route path="/game4/:lowkey/:rand" element={<Game4 />} />
-          <Route path="/game5" element = {<Game5 />} />
-          <Route path="/game6" element = {<Game6 />} />
-          <Route path="/game8" element = {<Game8 />} />
-          <Route path="/game9" element={<Game9 />} />
+          <Route path="/difficulty/:edition" element={<Difficulty />} />
+          <Route path="/tower/:lowkey/:rand/:edition/:lvl" element={<Tower />} />
         </Routes>
       </div>
 

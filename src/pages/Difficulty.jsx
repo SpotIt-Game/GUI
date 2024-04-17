@@ -1,7 +1,9 @@
 import PlainCard from "../components/PlainCard"
+import { useParams } from "react-router-dom"
 
 function Difficulty(){
-
+    
+    const { edition } = useParams()
     const styler = {
         display: `grid`,
         textAllign: `center`,
@@ -16,19 +18,19 @@ function Difficulty(){
             <h1 style={styler}>Choose Difficulty</h1>
             <ul className="diflist">
                 <li>
-                    <PlainCard text={"4"} page="/wait/4"></PlainCard>
+                    <PlainCard text={"4"} page= {`/wait/4/${edition}`}></PlainCard>
                 </li>
                 <li>
-                    <PlainCard text="5" page="/game5"/>
+                    <PlainCard text="5" page= {`/wait/5/${edition}`}/>
                 </li>
                 <li>
-                    <PlainCard text="6" page="/game6"/>
+                    <PlainCard text="6" page= {`/wait/6${edition}`}/>
                 </li>
                 <li>
-                    <PlainCard text="8"  page="/game8"/>
+                    <PlainCard text="8"  page= {`/wait/8/${edition}`}/>
                 </li>
                 <li>
-                <PlainCard text="9"  page="/game9"/>
+                <PlainCard text="9"  page= {`/wait/9/${edition}`}/>
                 </li>
             </ul>
 
