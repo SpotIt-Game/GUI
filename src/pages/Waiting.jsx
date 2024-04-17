@@ -4,13 +4,14 @@ import { child, ref, onValue, set, query, get, remove, update, push, runTransact
 import { useEffect } from "react";
 import { async } from "@firebase/util";
 import { useState } from "react";
-
+import { useParams } from "react-router-dom";
 
 function Waiting(){
     let pathKey = ""
     let rando = 0
     const [inLobby, setInLobby] = useState(false)
     const [LobbyKey, setLobbyKey] = useState("testing...")
+    const { diff } = useParams()
     let checker = false
 
 
@@ -20,7 +21,7 @@ function Waiting(){
         }
         checker = true
 
-        const newLobbyRef = ref(rt, '/lobbies/4s')
+        const newLobbyRef = ref(rt, `/lobbies/${diff}s`)
         const newLobby1Ref = await push(newLobbyRef)
         setLobbyKey(newLobby1Ref.key)
         pathKey = newLobby1Ref.key
@@ -32,22 +33,19 @@ function Waiting(){
             turn: 1,
             srtFact: rando
         })
-        addPlayerToLobby(`/lobbies/4s/${newLobby1Ref.key}`)
+        addPlayerToLobby(`/lobbies/${diff}s/${newLobby1Ref.key}`)
         setInLobby(true)
     }
 
     const startGame = async (path) => {
-        const refer = ref(rt, path + '/start')
-        try{
-            await runTransaction(refer, (currentData) => {
-                return true
-            })
+        const refer = ref(rt, path);
+        try {
+            await update(refer, { start: true });
+        } catch (error) {
+            console.error(error);
         }
-        catch(error){
-            console.error(error)
-        }
-
-    }
+    };
+    
 
     const addPlayerToLobby = async (path) => {
         const refer = ref(rt, path)
@@ -111,7 +109,7 @@ function Waiting(){
     }
 
     const deleteData = async () => {
-        const refer = ref(rt, "/lobbies/4s/" + LobbyKey)
+        const refer = ref(rt, `/lobbies/${diff}s/` + LobbyKey)
         try{
             await remove(refer)
             console.log("updated?")
@@ -122,12 +120,12 @@ function Waiting(){
     }
 
     const useEffectWithAsync = async () => {
-        if (await checkEmpty("lobbies/4s")) {
+        if (await checkEmpty(`lobbies/${diff}s`)) {
             await addLobby();
             checker = true;
         }
         else if(!inLobby){
-            findLobby("lobbies/4s")
+            findLobby(`lobbies/${diff}s`)
             setInLobby(true)
         }
     };
@@ -135,7 +133,7 @@ function Waiting(){
 
     const goToGame = () => {
         console.log(pathKey)
-        const url = `/game4/${pathKey}/${rando}`
+        const url = `/game${diff}/${pathKey}/${rando}`
         console.log(url)
         window.location.href = url;
     };
@@ -151,7 +149,7 @@ function Waiting(){
     }
 
     const addPoints = async () => {
-        const refer =  ref(rt, `/lobbies/4s/${pathKey}/${auth.currentUser.uid}/points`)
+        const refer =  ref(rt, `/lobbies/${diff}s/${pathKey}/${auth.currentUser.uid}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(pathKey)

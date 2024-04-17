@@ -16,7 +16,7 @@ function Difficulty(){
             <h1 style={styler}>Choose Difficulty</h1>
             <ul className="diflist">
                 <li>
-                    <PlainCard text={"4"} page="/wait"></PlainCard>
+                    <PlainCard text={"4"} page="/wait/4"></PlainCard>
                 </li>
                 <li>
                     <PlainCard text="5" page="/game5"/>

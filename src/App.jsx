@@ -25,7 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/wait" element={<Waiting />} />
+          <Route path="/wait/:diff" element={<Waiting />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/about" element={<About />} />
           <Route path="/difficulty" element={<Difficulty />} />
