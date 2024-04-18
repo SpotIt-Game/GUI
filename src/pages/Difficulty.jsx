@@ -18,19 +18,19 @@ function Difficulty(){
             <h1 style={styler}>Choose Difficulty</h1>
             <ul className="diflist">
                 <li>
-                    <PlainCard text={"4"} page= {`/wait/4/${edition}`}></PlainCard>
+                    <PlainCard text={"4"} tsize={200} page= {`/modes/${edition}/4`}></PlainCard>
                 </li>
                 <li>
-                    <PlainCard text="5" page= {`/wait/5/${edition}`}/>
+                    <PlainCard text="5" tsize={200} page= {`/modes/${edition}/5`}/>
                 </li>
                 <li>
-                    <PlainCard text="6" page= {`/wait/6${edition}`}/>
+                    <PlainCard text="6" tsize={200} page= {`/modes/${edition}/6`}/>
                 </li>
                 <li>
-                    <PlainCard text="8"  page= {`/wait/8/${edition}`}/>
+                    <PlainCard text="8" tsize={200} page= {`/modes/${edition}/8`}/>
                 </li>
                 <li>
-                <PlainCard text="9"  page= {`/wait/9/${edition}`}/>
+                <PlainCard text="9" tsize={200} page= {`/modes/${edition}/9`}/>
                 </li>
             </ul>
 

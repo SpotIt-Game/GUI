@@ -31,7 +31,7 @@ function Card(props){
       }
 
     const handler = (link) => {
-        onButtonClick(link)
+        onButtonClick(link, props.num)
     }
 
     const galleryItems = imgs.map(icon => 

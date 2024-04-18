@@ -5,6 +5,8 @@ function PlainCard(props){
         width: `420px`,
         height: `420px`,
         borderRadius: `50%`,
+        justifyContent: `center`,
+        alignItems: `center`,
         border: `solid  15px hsl(277, 64%, 62%)`,
         backgroundColor: `hsl(56, 100%, 50%)`,
         scale: `0.5`,
@@ -16,13 +18,9 @@ function PlainCard(props){
         display: `grid`,
         color: `hsl(277, 64%, 62%)`,
         fontFamily: `"Boink Drop Shadow W01", Arial, Helvetica, sans-serif`,
-        justifyContent: `center`,
-        alignItems: `center`,
         position: `relative`,
-        fontSize: `200px`,
+        fontSize: `${props.tsize}px`,
         textAlign: `center`,
-        top: `-100px`,
-        left: `100px`, 
     }
 
 

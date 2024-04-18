@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Card from "../components/Card";
 import { db } from "../firebase/config"
@@ -9,16 +10,17 @@ import { child, ref, onValue, set, query, get, remove, update, push, runTransact
 import { rt } from "../firebase/config"
 import { useParams } from "react-router-dom";
 import seedrandom from "seedrandom";
-function Tower(){
+function Triplet(){
     const [data, setData] = useState(null); // Declare state variable and its setter function
     const [loading, setLoading] = useState(true);
     const [segment, setSegment] = useState([]);
     const image_cardCollectionRef = collection(db, "image_card")
-    const [a, setA] = useState(1);
-    const [b, setB] = useState(0);
+    const [cardList, setCardList] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8])
     const { lowkey, rand, edition,  lvl } = useParams();
     const [t, setT] = useState(0)
     const [winner, setWinner] = useState({points: 0, name: ""})
+    let used = [];
+    let links = [];
     let start = 0;
     let end = 0;
     if(lvl == 4 && edition == 'cs'){
@@ -105,10 +107,7 @@ function Tower(){
             setLoading(false);
         }
         waiter()
-}, [])    
-
-
-
+}, [])
 
       useEffect(() => {
         setSegment(segment.sort(() => rand - 0.5))
@@ -117,9 +116,9 @@ function Tower(){
 
 
     useEffect(() => {
-        console.log(a, "This is the value of A")
-    }, [a])
-
+        console.log(cardList, "Card list")
+    }, [cardList])
+    
 
 
 
@@ -150,74 +149,112 @@ function Tower(){
     let pre = ""
 
     const addPoints = async () => {
-        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/tower/${lowkey}/${auth.currentUser.uid}/points`)
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/triplet/${lowkey}/${auth.currentUser.uid}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(lowkey)
                 return currentData + 1
             })
-            setB(prevB => prevB + 1)
         }
         catch(error){
             console.error("error adding points", error)
         }
     }
 
-    const listenToTurn = async (node, callback) => {
-        const refer = ref(rt, node + "/turn")
-        onValue(refer, (snapshot) => {
+    const listenToDeck = async (node, callback) => {
+        const refer = ref(rt, node + "/deck")
+        await onValue(refer, (snapshot) => {
             console.log(snapshot.val())
-            if(snapshot.val() > t){
-                setT(snapshot.val())
-                setA(snapshot.val())
+            const isEqual = JSON.stringify(cardList) === JSON.stringify(snapshot.val());
+            console.log(isEqual)
+            if(!isEqual){
+                setCardList(snapshot.val())
                 callback()
-                console.log(a, "this is the value of A")
             }
         })
     }
 
-    listenToTurn(`lobbies/${edition}/${lvl}s/tower/${lowkey}`, async () => {
-        console.log(a, "this is the value of A")
+    listenToDeck(`lobbies/${edition}/${lvl}s/triplet/${lowkey}`, async () => {
     })
 
+    const listenToTurn = async (node, callback) => {
+        const refer = ref(rt, node + "/turn")
+        await onValue(refer, (snapshot) => {
+            console.log(snapshot.val(), "this is snappyWappy")
+            console.log(t, "this is t")
+            if(snapshot.val() > t){
+                setT(snapshot.val())
+                callback()
+            }
+        })
+    }
+
+    listenToTurn(`lobbies/${edition}/${lvl}s/triplet/${lowkey}`, async () => {
+    })
     const nextTurn = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/tower/${lowkey}/turn`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}/turn`)
         try{
-            await runTransaction(refer, (currentData) => {
-                return currentData + 1
+            const snapshot = await runTransaction(refer, (currentData) => {
+                return currentData + 3
             })
         }
         catch(error){
             console.error("error adding points", error)
         }
     }
-
-    const verificador = (link, num) => {
-        if(link == pre){
-            addPoints()
-            setB(a - 1)
-            nextTurn()
+    const updateDeck = async () => {
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}/deck`)
+        const tref = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}/turn`)
+        const snapshot = await get(refer)
+        let snap = snapshot.val()
+        const turno = await get(tref)
+        const p = turno.val()
+        console.log(snap, "This is snap")
+        setT(p)
+        console.log(snap[used[0]])
+        snap[used[0]] = p - 3;
+        snap[used[1]] = p - 2;
+        snap[used[2]] = p - 1;
+        try{
+            await set(refer, snap)
         }
-        pre = ""
+        catch(error){
+            console.log("Use update instead")
+        }
+
+
+
     }
 
-    const setPre = (link, num) => {
-        pre = link
-    }
-    auth.onAuthStateChanged(function(user) {
-        if (user) {
-          // User is signed in
-          console.log('User is authenticated:', user);
-          // You can access user information like user.uid, user.displayName, etc.
-        } else {
-          // User is signed out
-          console.log('User is not authenticated');
-          // Redirect to sign-in page or display a sign-in modal
+    const verificador = async (link, number) => {
+        if(used.includes(number)){
+            links = [link];
+            used = [number];
         }
-      });
+        else{
+            if(links != [] && !links.includes(link)){
+                links = [link];
+                used = [number];
+            }
+            else{
+                links.push(link);
+                used.push(number);
+            }
+            if(links.length == 3){
+                await addPoints();
+                await nextTurn();
+                await updateDeck();
+                links = [];
+                used = [];
+            }
+        }
+    }
+
+
+
 
     const findWinner = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/tower/${lowkey}`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}`)
         const snapshot = await get(refer)
         snapshot.forEach((childSnap) => {
             if(childSnap.val().points > winner.points){
@@ -232,7 +269,7 @@ function Tower(){
         }
     }
 
-    if(a == end - start){
+    if(t >= end - start){
         findWinner()
         return(
             <>
@@ -245,15 +282,35 @@ function Tower(){
         <>
             <ul className="gameList">
                 <li>
-                    <Card gallery={segment[a]} num={a} onButtonClick={verificador} className="center"></Card>
+                    <Card gallery={segment[cardList[0]]} num={0} onButtonClick={verificador} ></Card>
                 </li>
                 <li>
-                    <Card gallery={segment[b]} num={b} className="jugador" onButtonClick={setPre}></Card>
-                    <p className="player"> Player Card </p>
+                    <Card gallery={segment[cardList[1]]} num={1} onButtonClick={verificador}></Card>
+                </li>
+                <li>
+                    <Card gallery={segment[cardList[2]]} num={2} onButtonClick={verificador} />
+                </li>
+                <li>
+                    <Card gallery={segment[cardList[3]]} num={3} onButtonClick={verificador} />
+                </li>
+                <li>
+                    <Card gallery={segment[cardList[4]]} num={4} onButtonClick={verificador} />
+                </li>
+                <li>
+                    <Card gallery={segment[cardList[5]]} num={5} onButtonClick={verificador} />
+                </li>
+                <li>
+                    <Card gallery={segment[cardList[6]]} num={6} onButtonClick={verificador} />
+                </li>
+                 <li>
+                    <Card gallery={segment[cardList[7]]} num={7} onButtonClick={verificador} />
+                </li>               
+                <li>
+                    <Card gallery={segment[cardList[8]]} num={8} onButtonClick={verificador} />
                 </li>
             </ul>
         </>
     )
 }
 
-export default Tower
+export default Triplet

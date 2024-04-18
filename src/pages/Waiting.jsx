@@ -11,8 +11,15 @@ function Waiting(){
     let rando = 0
     const [inLobby, setInLobby] = useState(false)
     const [LobbyKey, setLobbyKey] = useState("testing...")
-    const { edition, diff } = useParams()
+    const { edition, diff, mode } = useParams()
     let checker = false
+    let limit = 0;
+    if(mode == 'tower'){
+        limit = 5;
+    }
+    else if(mode == 'triplet'){
+        limit = 6;
+    }
 
 
     const addLobby = async () => {
@@ -21,19 +28,29 @@ function Waiting(){
         }
         checker = true
 
-        const newLobbyRef = ref(rt, `/lobbies/${edition}/${diff}s`)
+        const newLobbyRef = ref(rt, `/lobbies/${edition}/${diff}s/${mode}`)
         const newLobby1Ref = await push(newLobbyRef)
         setLobbyKey(newLobby1Ref.key)
         pathKey = newLobby1Ref.key
         console.log(pathKey)
         rando = Math.random()
         rando = Math.floor(rando * (1000000)) + 1
-        await set(newLobby1Ref, {
-            start: false,
-            turn: 1,
-            srtFact: rando
-        })
-        addPlayerToLobby(`/lobbies/${edition}/${diff}s/${newLobby1Ref.key}`)
+        if(mode == "triplet"){
+            await set(newLobby1Ref, {
+                start: false,
+                turn: 9,
+                deck: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                srtFact: rando
+            })
+        }
+        else if(mode == "tower"){
+            await set(newLobby1Ref, {
+                start: false,
+                turn: 1,
+                srtFact: rando
+            })
+        }
+        addPlayerToLobby(`/lobbies/${edition}/${diff}s/${mode}/${newLobby1Ref.key}`)
         setInLobby(true)
     }
 
@@ -62,7 +79,7 @@ function Waiting(){
             console.error(error)
         }
         try{
-            if((await get(refer)).size === 5){
+            if((await get(refer)).size === limit){
                 startGame(path)
             }
         }
@@ -108,24 +125,13 @@ function Waiting(){
         }
     }
 
-    const deleteData = async () => {
-        const refer = ref(rt, `/lobbies/${edition}/${diff}s/` + LobbyKey)
-        try{
-            await remove(refer)
-            console.log("updated?")
-        }
-        catch(error){
-            console.error("Problems deleting", error)
-        }
-    }
-
     const useEffectWithAsync = async () => {
-        if (await checkEmpty(`lobbies/${edition}/${diff}s`)) {
+        if (await checkEmpty(`lobbies/${edition}/${diff}s/${mode}`)) {
             await addLobby();
             checker = true;
         }
         else if(!inLobby){
-            findLobby(`lobbies/${edition}/${diff}s`)
+            findLobby(`lobbies/${edition}/${diff}s/${mode}`)
             setInLobby(true)
         }
     };
@@ -133,7 +139,7 @@ function Waiting(){
 
     const goToGame = () => {
         console.log(pathKey)
-        const url = `/tower/${pathKey}/${rando}/${edition}/${diff}`
+        const url = `/${mode}/${pathKey}/${rando}/${edition}/${diff}`
         console.log(url)
         window.location.href = url;
     };
@@ -148,18 +154,6 @@ function Waiting(){
         })
     }
 
-    const addPoints = async () => {
-        const refer =  ref(rt, `/lobbies/${edition}/${diff}s/${pathKey}/${auth.currentUser.uid}/points`)
-        try{
-            await runTransaction(refer, (currentData) => {
-                console.log(pathKey)
-                return currentData + 1
-            })
-        }
-        catch(error){
-            console.error(error)
-        }
-    }
 
     useEffect(() => {
         useEffectWithAsync()
@@ -171,8 +165,8 @@ function Waiting(){
     return(
         <>
             <h1 className="waiting" >this is the testing faze</h1>
-            <button onClick={deleteData}>DeleteData</button>
-            <button onClick={addPoints}>AddPoints</button>
+            <button >DeleteData</button>
+            <button >AddPoints</button>
 
         </>
     )
