@@ -13,13 +13,8 @@ function Waiting(){
     const [LobbyKey, setLobbyKey] = useState("testing...")
     const { edition, diff, mode } = useParams()
     let checker = false
-    let limit = 0;
-    if(mode == 'tower'){
-        limit = 5;
-    }
-    else if(mode == 'triplet'){
-        limit = 6;
-    }
+    let limit = 2;
+
 
 
     const addLobby = async () => {
@@ -50,6 +45,14 @@ function Waiting(){
                 srtFact: rando
             })
         }
+        else if(mode == "potato"){
+            await set(newLobby1Ref, {
+                start: false,
+                turn: 1,
+                srtFact: rando,
+                pCount: 0
+            })
+        }
         addPlayerToLobby(`/lobbies/${edition}/${diff}s/${mode}/${newLobby1Ref.key}`)
         setInLobby(true)
     }
@@ -65,7 +68,8 @@ function Waiting(){
     
 
     const addPlayerToLobby = async (path) => {
-        const refer = ref(rt, path)
+        const refer = ref(rt, path + "/players")
+        const lobref = ref(rt, path);
         try{
             await update(refer, {
                 [auth.currentUser.uid]: {
@@ -73,6 +77,21 @@ function Waiting(){
                     name: auth.currentUser.uid
                 } 
             })
+            if(mode == 'potato'){
+                const pc = (await get(refer)).size
+                await update(lobref, {
+                    pCount: pc
+                })
+                await update(refer, {
+                    [auth.currentUser.uid]: {
+                        points: 0,
+                        name: auth.currentUser.uid,
+                        pos: pc
+                    }
+                })
+                
+
+            }
             listenToStart(path, goToGame)
         }
         catch(error){

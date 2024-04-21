@@ -149,7 +149,7 @@ function Triplet(){
     let pre = ""
 
     const addPoints = async () => {
-        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/triplet/${lowkey}/${auth.currentUser.uid}/points`)
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/triplet/${lowkey}/players/${auth.currentUser.uid}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(lowkey)
@@ -254,7 +254,8 @@ function Triplet(){
 
 
     const findWinner = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}/players`)
+        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/triplet/${lowkey}`)
         const snapshot = await get(refer)
         snapshot.forEach((childSnap) => {
             if(childSnap.val().points > winner.points){
@@ -262,7 +263,7 @@ function Triplet(){
             }
         })
         try{
-            await remove(refer)
+            await remove(lobref)
         }
         catch(error){
             console.error(error)

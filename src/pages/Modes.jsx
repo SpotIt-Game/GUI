@@ -21,6 +21,12 @@ function Modes(){
                 <li>
                     <PlainCard text={"Triplet"} page= {`/wait/${edition}/${lvl}/triplet`} tsize={80}></PlainCard>
                 </li>
+                <li>
+                    <PlainCard text={"Well"} page = {`/wait/${edition}/${lvl}/well`} tsize={100}></PlainCard>
+                </li>
+                <li>
+                    <PlainCard text={"H.Potato"} page = {`/wait/${edition}/${lvl}/potato`} tsize={100}></PlainCard>
+                </li>
 
             </ul>
     </>

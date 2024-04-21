@@ -9,7 +9,9 @@ import { child, ref, onValue, set, query, get, remove, update, push, runTransact
 import { rt } from "../firebase/config"
 import { useParams } from "react-router-dom";
 import seedrandom from "seedrandom";
-function Tower(){
+function Potato(){
+    const [Pcount, setPcount] = useState(0);
+    const [pNum, setPNum] = useState(0);
     const [data, setData] = useState(null); // Declare state variable and its setter function
     const [loading, setLoading] = useState(true);
     const [segment, setSegment] = useState([]);
@@ -19,6 +21,9 @@ function Tower(){
     const { lowkey, rand, edition,  lvl } = useParams();
     const [t, setT] = useState(0)
     const [winner, setWinner] = useState({points: 0, name: ""})
+    const [currSlice, setCurrSlice] = useState([])
+
+    const [cardList, setCardList] = useState()
     let start = 0;
     let end = 0;
     if(lvl == 4 && edition == 'cs'){
@@ -66,6 +71,12 @@ function Tower(){
     useEffect(() => {
         const apiUrl = 'https://q3cgus21cj.execute-api.us-east-2.amazonaws.com/dev'
         const fetchData = async () => {
+            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/pCount`);
+            setPcount((await get(refer)).val())
+            const pref = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/players/${auth.currentUser.uid}/pos`);
+            setPNum((await get(pref)).val())
+
+
             try{
                 const response = await fetch(apiUrl)
                 if(!response.ok){
@@ -102,12 +113,45 @@ function Tower(){
     }
         const waiter = async () => {
             await fetchData();
+            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/pCount`);
+            console.log(Pcount, "WTF")
+            console.log(pNum, "p number")
             setLoading(false);
+            const pref = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/${auth.currentUser.uid}/pos`);
+
         }
         waiter()
 }, [])    
 
+    useEffect(() =>{
+        setCurrSlice(segment.slice(0, Pcount))
+    }, [segment])
 
+
+    useEffect(() =>{
+            setCardList(currSlice.map((current, index) => {
+            console.log(index, pNum)
+            if(index + 1 == pNum){
+                return(
+                    <li>
+                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
+                        <p className='player'> Player Card </p>                 
+                    </li>
+                )
+            }
+            else{
+                return(
+                    <li>
+                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
+                    </li>
+                )
+            }
+        }))
+        console.log(currSlice, "This is currSlice")
+            
+
+
+    }, [currSlice])
 
 
       useEffect(() => {
@@ -119,6 +163,7 @@ function Tower(){
     useEffect(() => {
         console.log(a, "This is the value of A")
     }, [a])
+
 
 
 
@@ -150,9 +195,8 @@ function Tower(){
     let pre = ""
     let cnum = -1
 
-
     const addPoints = async () => {
-        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/tower/${lowkey}/players/${auth.currentUser.uid}/points`)
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/players/${auth.currentUser.uid}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(lowkey)
@@ -170,6 +214,7 @@ function Tower(){
         onValue(refer, (snapshot) => {
             console.log(snapshot.val())
             if(snapshot.val() > t){
+                setCurrSlice(segment.slice(Pcount * t, Pcount * snapshot.val()))
                 setT(snapshot.val())
                 setA(snapshot.val())
                 callback()
@@ -178,12 +223,12 @@ function Tower(){
         })
     }
 
-    listenToTurn(`lobbies/${edition}/${lvl}s/tower/${lowkey}`, async () => {
+    listenToTurn(`lobbies/${edition}/${lvl}s/potato/${lowkey}`, async () => {
         console.log(a, "this is the value of A")
     })
 
     const nextTurn = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/tower/${lowkey}/turn`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}/turn`)
         try{
             await runTransaction(refer, (currentData) => {
                 return currentData + 1
@@ -194,12 +239,10 @@ function Tower(){
         }
     }
 
-
     const verificador = (link, num) => {
         if(link == pre && num != cnum){
             link = ""
             num = -1
-            setB(a - 1)
             addPoints()
             nextTurn()
         }
@@ -209,24 +252,10 @@ function Tower(){
         }
     }
 
-    const setPre = (link, num) => {
-        pre = link
-    }
-    auth.onAuthStateChanged(function(user) {
-        if (user) {
-          // User is signed in
-          console.log('User is authenticated:', user);
-          // You can access user information like user.uid, user.displayName, etc.
-        } else {
-          // User is signed out
-          console.log('User is not authenticated');
-          // Redirect to sign-in page or display a sign-in modal
-        }
-      });
 
     const findWinner = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/tower/${lowkey}/players`)
-        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/tower/${lowkey}`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}/players`)
+        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}`)
         const snapshot = await get(refer)
         snapshot.forEach((childSnap) => {
             if(childSnap.val().points > winner.points){
@@ -234,35 +263,32 @@ function Tower(){
             }
         })
         try{
-            await remove(lobRef)
+            await remove(refer)
         }
         catch(error){
             console.error(error)
         }
     }
 
-    if(a == end - start){
+    if(a * Pcount >= end - start){
         findWinner()
         return(
             <>
                 <h1 className="overScreen" >The winner is {winner.name}</h1>
             </>
         )
+
     }
+
+
     return(
         
         <>
             <ul className="gameList">
-                <li>
-                    <Card gallery={segment[a]} num={0} onButtonClick={verificador} className="center"></Card>
-                </li>
-                <li>
-                    <Card gallery={segment[b]} num={1} className="jugador" onButtonClick={verificador}></Card>
-                    <p className="player"> Player Card </p>
-                </li>
+                {cardList}
             </ul>
         </>
     )
 }
 
-export default Tower
+export default Potato
