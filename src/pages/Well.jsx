@@ -9,21 +9,17 @@ import { child, ref, onValue, set, query, get, remove, update, push, runTransact
 import { rt } from "../firebase/config"
 import { useParams } from "react-router-dom";
 import seedrandom from "seedrandom";
-function Potato(){
+function Well(){
     const [Pcount, setPcount] = useState(0);
-    const [pNum, setPNum] = useState(0);
     const [data, setData] = useState(null); // Declare state variable and its setter function
     const [loading, setLoading] = useState(true);
     const [segment, setSegment] = useState([]);
     const image_cardCollectionRef = collection(db, "image_card")
-    const [a, setA] = useState(1);
+    const [a, setA] = useState(0);
     const [b, setB] = useState(0);
-    const { lowkey, rand, edition,  lvl } = useParams();
+    const { lowkey, rand, edition,  lvl, pNum } = useParams();
     const [t, setT] = useState(0)
     const [winner, setWinner] = useState({points: 0, name: ""})
-    const [currSlice, setCurrSlice] = useState([])
-
-    const [cardList, setCardList] = useState()
     let start = 0;
     let end = 0;
     if(lvl == 4 && edition == 'cs'){
@@ -71,10 +67,9 @@ function Potato(){
     useEffect(() => {
         const apiUrl = 'https://q3cgus21cj.execute-api.us-east-2.amazonaws.com/dev'
         const fetchData = async () => {
-            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/pCount`);
+            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/well/${lowkey}/pCount`);
             setPcount((await get(refer)).val())
-            const pref = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/players/${auth.currentUser.uid}/pos`);
-            setPNum((await get(pref)).val())
+
 
 
             try{
@@ -113,45 +108,18 @@ function Potato(){
     }
         const waiter = async () => {
             await fetchData();
-            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/pCount`);
-            console.log(Pcount, "WTF")
-            console.log(pNum, "p number")
             setLoading(false);
-            const pref = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/${auth.currentUser.uid}/pos`);
-
         }
         waiter()
 }, [])    
 
-    useEffect(() =>{
-        setCurrSlice(segment.slice(0, Pcount))
-    }, [segment])
+    useEffect(() => {
+        setB(((end - start) / Pcount) * (pNum - 1) + 1)
+        console.log(((end - start) / Pcount) * (pNum) + 1, "WTF is a km")
+        console.log(Pcount)
+    }, [Pcount])
 
 
-    useEffect(() =>{
-            setCardList(currSlice.map((current, index) => {
-            console.log(index, pNum)
-            if(index + 1 == pNum){
-                return(
-                    <li>
-                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
-                        <p className='player'> Player Card </p>                 
-                    </li>
-                )
-            }
-            else{
-                return(
-                    <li>
-                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
-                    </li>
-                )
-            }
-        }))
-        console.log(currSlice, "This is currSlice")
-            
-
-
-    }, [currSlice])
 
 
       useEffect(() => {
@@ -161,9 +129,8 @@ function Potato(){
 
 
     useEffect(() => {
-        console.log(a, "This is the value of A")
-    }, [a])
-
+        console.log(b, "This is the value of B")
+    }, [b])
 
 
 
@@ -195,8 +162,9 @@ function Potato(){
     let pre = ""
     let cnum = -1
 
+
     const addPoints = async () => {
-        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/players/${auth.currentUser.uid}/points`)
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/well/${lowkey}/players/${auth.currentUser.uid}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(lowkey)
@@ -212,24 +180,34 @@ function Potato(){
     const listenToTurn = async (node, callback) => {
         const refer = ref(rt, node + "/turn")
         onValue(refer, (snapshot) => {
-            console.log(snapshot.val())
+            if(b == 1000){return}
+            console.log(b, "This is fucking b")
+            if(snapshot.val() == 1000){
+                setB(1000)
+                return
+            }
             if(snapshot.val() > t){
-                setCurrSlice(segment.slice(Pcount * t, Pcount * snapshot.val()))
                 setT(snapshot.val())
-                setA(snapshot.val())
-                callback()
+                callback(node)
                 console.log(a, "this is the value of A")
             }
         })
     }
 
-    listenToTurn(`lobbies/${edition}/${lvl}s/potato/${lowkey}`, async () => {
-        console.log(a, "this is the value of A")
+    listenToTurn(`lobbies/${edition}/${lvl}s/well/${lowkey}`, async (node) => {
+        
+        const middRef = ref(rt, node + "/middCard")
+        console.log("Is this shit working?")
+        setA((await get(middRef)).val())
     })
 
-    const nextTurn = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}/turn`)
+    const nextTurn = async (nCard) => {
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/well/${lowkey}/turn`)
+        const cRef = ref(rt, `lobbies/${edition}/${lvl}s/well/${lowkey}`)
         try{
+            await update(cRef, { 
+                middCard: nCard
+            })
             await runTransaction(refer, (currentData) => {
                 return currentData + 1
             })
@@ -239,12 +217,15 @@ function Potato(){
         }
     }
 
+
     const verificador = (link, num) => {
-        if(link == pre && num + 1 != cnum && (num + 1 == pNum || cnum == pNum)){
+        if(link == pre && num != cnum){
             link = ""
             num = -1
+            const nCard = b;
+            setB(prevB => prevB + 1)
             addPoints()
-            nextTurn()
+            nextTurn(nCard)
         }
         else{
             pre = link;
@@ -252,10 +233,16 @@ function Potato(){
         }
     }
 
+    const setPre = (link, num) => {
+        pre = link
+    }
 
     const findWinner = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}/players`)
-        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/well/${lowkey}/players`)
+        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/well/${lowkey}`)
+        await update(lobRef, {
+            turn: 1000
+        })
         const snapshot = await get(refer)
         snapshot.forEach((childSnap) => {
             if(childSnap.val().points > winner.points){
@@ -263,32 +250,37 @@ function Potato(){
             }
         })
         try{
-            await remove(refer)
+            await remove(lobRef)
         }
         catch(error){
             console.error(error)
         }
     }
 
-    if(a * Pcount >= end - start){
+    if(b >= end-start || b >= ((end - start) / Pcount) * (pNum) + 1 || b == 1000){
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/well/${lowkey}/turn`)
+        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/well/${lowkey}`)
         findWinner()
         return(
             <>
                 <h1 className="overScreen" >The winner is {winner.name}</h1>
             </>
         )
-
     }
-
-
     return(
         
         <>
             <ul className="gameList">
-                {cardList}
+                <li>
+                    <Card gallery={segment[a]} num={0} onButtonClick={verificador} className="center"></Card>
+                </li>
+                <li>
+                    <Card gallery={segment[b]} num={1} className="jugador" onButtonClick={verificador}></Card>
+                    <p className="player"> Player Card </p>
+                </li>
             </ul>
         </>
     )
 }
 
-export default Potato
+export default Well

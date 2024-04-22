@@ -6,6 +6,8 @@ import About from "./pages/About";
 import Tower from "./pages/Tower.jsx"
 import Triplet from "./pages/Triplet.jsx"
 import Potato from "./pages/Potato.jsx"
+import Poison from "./pages/Poison.jsx"
+import Well from "./pages/Well.jsx"
 import Modes from "./pages/Modes.jsx"
 import Difficulty from "./pages/Difficulty";
 import Auth from "./components/Auth" 
@@ -32,6 +34,8 @@ function App() {
           <Route path="/tower/:lowkey/:rand/:edition/:lvl" element={<Tower />} />
           <Route path="/triplet/:lowkey/:rand/:edition/:lvl" element={<Triplet />} /> 
           <Route path="/potato/:lowkey/:rand/:edition/:lvl" element={<Potato />} />
+          <Route path="/poison/:lowkey/:rand/:edition/:lvl/:pNum" element={<Poison />} />
+          <Route path="/well/:lowkey/:rand/:edition/:lvl/:pNum" element={<Well />} />
         </Routes>
       </div>
 

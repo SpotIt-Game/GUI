@@ -1,6 +1,6 @@
 import { auth } from "../firebase/config"
 import { rt } from "../firebase/config"
-import { child, ref, onValue, set, query, get, remove, update, push, runTransaction} from "firebase/database";
+import { child, ref, onValue, set, query, get, remove, update, push, runTransaction, } from "firebase/database";
 import { useEffect } from "react";
 import { async } from "@firebase/util";
 import { useState } from "react";
@@ -14,6 +14,7 @@ function Waiting(){
     const { edition, diff, mode } = useParams()
     let checker = false
     let limit = 2;
+    let pNum = 0;
 
 
 
@@ -53,6 +54,24 @@ function Waiting(){
                 pCount: 0
             })
         }
+        else if(mode == "poison"){
+            await set(newLobby1Ref, {
+                start: false,
+                turn: 1,
+                srtFact: rando,
+                pCount: 0,
+                cards: [0]
+            })
+        }
+        else if(mode == "well"){
+            await set(newLobby1Ref, {
+                start: false,
+                turn: 1,
+                srtFact: rando,
+                pCount: 0,
+                middCard: 0
+            })
+        }
         addPlayerToLobby(`/lobbies/${edition}/${diff}s/${mode}/${newLobby1Ref.key}`)
         setInLobby(true)
     }
@@ -70,14 +89,36 @@ function Waiting(){
     const addPlayerToLobby = async (path) => {
         const refer = ref(rt, path + "/players")
         const lobref = ref(rt, path);
+        const pRef = ref(rt, path +"/pCount")
+        const dq = query(pRef)
+        const pre = (await get(dq))
+        let ac = 0
+        if(!(await pre.exists())){
+            ac = 0
+        }
+        else{
+            ac = pre.val()
+            pNum = ac + 1;
+        }
         try{
-            await update(refer, {
-                [auth.currentUser.uid]: {
-                    points: 0,
-                    name: auth.currentUser.uid
-                } 
-            })
-            if(mode == 'potato'){
+            if(mode == "poison"){
+                await update(refer, {
+                    [ac + 1]: {
+                        points: 0,
+                        name: auth.currentUser.uid
+                    }
+                })
+            }
+            else{
+
+                await update(refer, {
+                    [auth.currentUser.uid]: {
+                        points: 0,
+                        name: auth.currentUser.uid
+                    } 
+                })
+            }
+            if(mode == 'potato' || mode == "well"){
                 const pc = (await get(refer)).size
                 await update(lobref, {
                     pCount: pc
@@ -91,6 +132,19 @@ function Waiting(){
                 })
                 
 
+            }
+            if(mode == "poison"){
+                const pc = (await get(refer)).size
+                await update(lobref, {
+                    pCount: pc
+                })
+                const cRef = ref(rt, path + "/cards")
+                const pre = (await get(cRef)).val()
+                console.log(pre, "this is the cardList")
+                pre.push(ac + 1)
+                await update(lobref, {
+                    cards: pre
+                })
             }
             listenToStart(path, goToGame)
         }
@@ -150,15 +204,21 @@ function Waiting(){
             checker = true;
         }
         else if(!inLobby){
-            findLobby(`lobbies/${edition}/${diff}s/${mode}`)
+            await findLobby(`lobbies/${edition}/${diff}s/${mode}`)
             setInLobby(true)
         }
     };
 
 
     const goToGame = () => {
+        if(mode == "poison" || mode == "well"){
+            const url = `/${mode}/${pathKey}/${rando}/${edition}/${diff}/${pNum}`
+            window.location.href = url;
+            return;
+        }
         console.log(pathKey)
         const url = `/${mode}/${pathKey}/${rando}/${edition}/${diff}`
+
         console.log(url)
         window.location.href = url;
     };

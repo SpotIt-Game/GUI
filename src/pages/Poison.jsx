@@ -9,16 +9,15 @@ import { child, ref, onValue, set, query, get, remove, update, push, runTransact
 import { rt } from "../firebase/config"
 import { useParams } from "react-router-dom";
 import seedrandom from "seedrandom";
-function Potato(){
+function Poison(){
     const [Pcount, setPcount] = useState(0);
-    const [pNum, setPNum] = useState(0);
     const [data, setData] = useState(null); // Declare state variable and its setter function
     const [loading, setLoading] = useState(true);
     const [segment, setSegment] = useState([]);
     const image_cardCollectionRef = collection(db, "image_card")
     const [a, setA] = useState(1);
     const [b, setB] = useState(0);
-    const { lowkey, rand, edition,  lvl } = useParams();
+    const { lowkey, rand, edition,  lvl, pNum } = useParams();
     const [t, setT] = useState(0)
     const [winner, setWinner] = useState({points: 0, name: ""})
     const [currSlice, setCurrSlice] = useState([])
@@ -71,10 +70,8 @@ function Potato(){
     useEffect(() => {
         const apiUrl = 'https://q3cgus21cj.execute-api.us-east-2.amazonaws.com/dev'
         const fetchData = async () => {
-            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/pCount`);
+            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/poison/${lowkey}/pCount`);
             setPcount((await get(refer)).val())
-            const pref = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/players/${auth.currentUser.uid}/pos`);
-            setPNum((await get(pref)).val())
 
 
             try{
@@ -113,40 +110,51 @@ function Potato(){
     }
         const waiter = async () => {
             await fetchData();
-            const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/pCount`);
             console.log(Pcount, "WTF")
             console.log(pNum, "p number")
             setLoading(false);
-            const pref = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/${auth.currentUser.uid}/pos`);
 
         }
         waiter()
 }, [])    
 
     useEffect(() =>{
-        setCurrSlice(segment.slice(0, Pcount))
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/poison/${lowkey}/cards`)
+        const upCurr = async () => {
+            setCurrSlice((await get(refer)).val())
+            console.log(currSlice ,"Wtf is this bullshit")
+        }
+        upCurr()
     }, [segment])
 
 
     useEffect(() =>{
+        try{
+
+        
             setCardList(currSlice.map((current, index) => {
-            console.log(index, pNum)
-            if(index + 1 == pNum){
-                return(
-                    <li>
-                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
-                        <p className='player'> Player Card </p>                 
-                    </li>
-                )
-            }
-            else{
-                return(
-                    <li>
-                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
-                    </li>
-                )
-            }
-        }))
+                console.log(index, pNum, "Please work????")
+                if(index == pNum){
+                    return(
+                        <li>
+                            <Card gallery={segment[current]} num = {index} onButtonClick={verificador}></Card>
+                            <p className='player'> Player Card </p>                 
+                        </li>
+                    )
+                }
+                else{
+                    return(
+                        <li>
+                            <Card gallery={segment[current]} num = {index} onButtonClick={verificador}></Card>
+                        </li>
+                    )
+                }
+
+            }))
+        }
+        catch(error){
+            console.log("I SWEAR TO GODD", currSlice)
+        }
         console.log(currSlice, "This is currSlice")
             
 
@@ -194,9 +202,10 @@ function Potato(){
 
     let pre = ""
     let cnum = -1
+    let numPy = -1
 
-    const addPoints = async () => {
-        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/potato/${lowkey}/players/${auth.currentUser.uid}/points`)
+    const addPoints = async (numberP) => {
+        const refer = ref(rt, `/lobbies/${edition}/${lvl}s/poison/${lowkey}/players/${numberP}/points`)
         try{
             await runTransaction(refer, (currentData) => {
                 console.log(lowkey)
@@ -214,7 +223,6 @@ function Potato(){
         onValue(refer, (snapshot) => {
             console.log(snapshot.val())
             if(snapshot.val() > t){
-                setCurrSlice(segment.slice(Pcount * t, Pcount * snapshot.val()))
                 setT(snapshot.val())
                 setA(snapshot.val())
                 callback()
@@ -223,13 +231,22 @@ function Potato(){
         })
     }
 
-    listenToTurn(`lobbies/${edition}/${lvl}s/potato/${lowkey}`, async () => {
-        console.log(a, "this is the value of A")
+    listenToTurn(`lobbies/${edition}/${lvl}s/poison/${lowkey}`, async () => {
+        const cref = ref(rt, `lobbies/${edition}/${lvl}s/poison/${lowkey}/cards`)
+        setCurrSlice((await get(cref)).val())
     })
 
-    const nextTurn = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}/turn`)
+    const nextTurn = async (punish) => {
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/poison/${lowkey}/turn`)
+        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/poison/${lowkey}`)
+        const cref = ref(rt, `lobbies/${edition}/${lvl}s/poison/${lowkey}/cards`)
         try{
+            let pre = (await get(cref)).val()
+            pre[punish] = pre[0];
+            pre[0] = Pcount + t;
+            await update(lobRef, {
+                cards: pre
+            })
             await runTransaction(refer, (currentData) => {
                 return currentData + 1
             })
@@ -240,11 +257,16 @@ function Potato(){
     }
 
     const verificador = (link, num) => {
-        if(link == pre && num + 1 != cnum && (num + 1 == pNum || cnum == pNum)){
+        if(link == pre && num != cnum && num != pNum && cnum != pNum){
+            let punish = 0;
+            if(num != 0){
+                punish = num;
+            }
+            else{punish = cnum}
             link = ""
             num = -1
-            addPoints()
-            nextTurn()
+            addPoints(punish)
+            nextTurn(punish)
         }
         else{
             pre = link;
@@ -254,23 +276,23 @@ function Potato(){
 
 
     const findWinner = async () => {
-        const refer = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}/players`)
-        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/potato/${lowkey}`)
+        const refer = ref(rt, `lobbies/${edition}/${lvl}s/poison/${lowkey}/players`)
+        const lobRef = ref(rt, `lobbies/${edition}/${lvl}s/poison/${lowkey}`)
         const snapshot = await get(refer)
         snapshot.forEach((childSnap) => {
-            if(childSnap.val().points > winner.points){
+            if(childSnap.val().points < winner.points){
                 setWinner(childSnap.val())
             }
         })
         try{
-            await remove(refer)
+            await remove(lobRef)
         }
         catch(error){
             console.error(error)
         }
     }
 
-    if(a * Pcount >= end - start){
+    if(a + Pcount >= end - start){
         findWinner()
         return(
             <>
@@ -291,4 +313,4 @@ function Potato(){
     )
 }
 
-export default Potato
+export default Poison
