@@ -137,7 +137,7 @@ function Poison(){
                 if(index == pNum){
                     return(
                         <li>
-                            <Card gallery={segment[current]} num = {index} onButtonClick={verificador}></Card>
+                            <Card scaler={0.6} gallery={segment[current]} num = {index} onButtonClick={verificador}></Card>
                             <p className='player'> Player Card </p>                 
                         </li>
                     )
@@ -145,7 +145,7 @@ function Poison(){
                 else{
                     return(
                         <li>
-                            <Card gallery={segment[current]} num = {index} onButtonClick={verificador}></Card>
+                            <Card scaler={0.6} gallery={segment[current]} num = {index} onButtonClick={verificador}></Card>
                         </li>
                     )
                 }

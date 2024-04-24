@@ -254,10 +254,10 @@ function Tower(){
         <>
             <ul className="gameList">
                 <li>
-                    <Card gallery={segment[a]} num={0} onButtonClick={verificador} className="center"></Card>
+                    <Card scaler={0.8} gallery={segment[a]} num={0} onButtonClick={verificador} className="center"></Card>
                 </li>
                 <li>
-                    <Card gallery={segment[b]} num={1} className="jugador" onButtonClick={verificador}></Card>
+                    <Card scaler ={0.8} gallery={segment[b]} num={1} className="jugador" onButtonClick={verificador}></Card>
                     <p className="player"> Player Card </p>
                 </li>
             </ul>

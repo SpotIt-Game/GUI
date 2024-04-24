@@ -283,31 +283,31 @@ function Triplet(){
         <>
             <ul className="gameList">
                 <li>
-                    <Card gallery={segment[cardList[0]]} num={0} onButtonClick={verificador} ></Card>
+                    <Card scaler={0.6} gallery={segment[cardList[0]]} num={0} styling={-80} onButtonClick={verificador} ></Card>
                 </li>
                 <li>
-                    <Card gallery={segment[cardList[1]]} num={1} onButtonClick={verificador}></Card>
+                    <Card scaler={0.6} gallery={segment[cardList[1]]} num={1} styling={-80} onButtonClick={verificador}></Card>
                 </li>
                 <li>
-                    <Card gallery={segment[cardList[2]]} num={2} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[2]]} num={2} styling={-80} onButtonClick={verificador} />
                 </li>
                 <li>
-                    <Card gallery={segment[cardList[3]]} num={3} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[3]]} num={3} styling={-80} onButtonClick={verificador} />
                 </li>
                 <li>
-                    <Card gallery={segment[cardList[4]]} num={4} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[4]]} num={4} styling={-80} onButtonClick={verificador} />
                 </li>
                 <li>
-                    <Card gallery={segment[cardList[5]]} num={5} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[5]]} num={5} styling={-80} onButtonClick={verificador} />
                 </li>
                 <li>
-                    <Card gallery={segment[cardList[6]]} num={6} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[6]]} num={6} styling={-80} onButtonClick={verificador} />
                 </li>
                  <li>
-                    <Card gallery={segment[cardList[7]]} num={7} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[7]]} num={7} styling={-80} onButtonClick={verificador} />
                 </li>               
                 <li>
-                    <Card gallery={segment[cardList[8]]} num={8} onButtonClick={verificador} />
+                    <Card scaler={0.6} gallery={segment[cardList[8]]} num={8} styling={-80} onButtonClick={verificador} />
                 </li>
             </ul>
         </>

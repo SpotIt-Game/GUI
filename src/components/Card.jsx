@@ -23,10 +23,10 @@ function Card(props){
         borderWidth: `10px`,
         borderRadius: `50%`,
         position: `relative`,
-        top: `${props.styling}px`,
-        margin: `50px`,
+        top: `10px`,
+        margin: `${props.styling}px`,
         backgroundColor: `rgb(230, 230, 230)`,
-        transform: `scale(1)`,
+        transform: `scale(${props.scaler})`,
 
       }
 

@@ -9,11 +9,14 @@ import { useParams } from "react-router-dom";
 function Waiting(){
     let pathKey = ""
     let rando = 0
+    const [activer, setActiver] = useState(false)
     const [inLobby, setInLobby] = useState(false)
     const [LobbyKey, setLobbyKey] = useState("testing...")
     const { edition, diff, mode } = useParams()
+    const [creator, setCreator] = useState(false)
+    const [finder, setFinder] = useState(false)
     let checker = false
-    let limit = 2;
+    let limit = 6;
     let pNum = 0;
 
 
@@ -73,11 +76,12 @@ function Waiting(){
             })
         }
         addPlayerToLobby(`/lobbies/${edition}/${diff}s/${mode}/${newLobby1Ref.key}`)
+        setCreator(true)
         setInLobby(true)
     }
 
-    const startGame = async (path) => {
-        const refer = ref(rt, path);
+    const startGame = async () => {
+        const refer = ref(rt, `/lobbies/${edition}/${diff}s/${mode}/${LobbyKey}`);
         try {
             await update(refer, { start: true });
         } catch (error) {
@@ -152,8 +156,8 @@ function Waiting(){
             console.error(error)
         }
         try{
-            if((await get(refer)).size === limit){
-                startGame(path)
+            if((await get(refer)).size == limit){
+                startGame()
             }
         }
         catch(error){
@@ -226,26 +230,80 @@ function Waiting(){
     const listenToStart = async (node, callback) => {
         const refer = ref(rt, node + "/start")
         onValue(refer, (snapshot) => {
-            console.log(snapshot.val())
             if(snapshot.val() == true){
                 callback()
             }
         })
     }
 
+    const joiner = async () => {
+        const lo = `lobbies/${edition}/${diff}s/${mode}/${LobbyKey}`
+        pathKey = LobbyKey
+        console.log(lo)
+        const refer = ref(rt, lo)
+        const dataQuery = query(refer)
+        const snapshot = await get(dataQuery)
+        if(snapshot.exists()){
+            rando = snapshot.val().srtFact
+            addPlayerToLobby(lo)
+            setActiver(true)
+        }
 
-    useEffect(() => {
-        useEffectWithAsync()
-    }, []);
+
+
+    }
+
+
+    const finding = () =>{
+        setFinder(true)
+    }
+    if(activer){
+        return(
+            <>
+                <h1 className="creMes">Waiting for game to start</h1>
+            </>
+        )
+    }
+
+    if(creator){
+        return(
+            <>
+                <h1 className="creMes">Share this key with your friends!</h1>
+                <h1 className="LobKey"> {LobbyKey} </h1>
+                <div className="inpLob">
+                    <button className = "LobJoin" onClick={startGame}>Start Game!</button>
+
+                </div>
+            </>
+        )
+    }
+
+    if(finder){
+        return(
+            <>
+                <h1 className="creMes">Paste the game code in the text box</h1>
+                <div className="inpLob">
+                    <input className="LobIn" placeholder="LobbyKey" onChange={(e) => setLobbyKey(e.target.value)}/>
+                    <button className="LobJoin" onClick={joiner}>Join Lobby!</button>
+                </div>
+            </>
+        )
+    }
+
 
 
 
 
     return(
         <>
-            <h1 className="waiting" >this is the testing faze</h1>
-            <button >DeleteData</button>
-            <button >AddPoints</button>
+            <ul className="optList">
+                <li>
+                    <button onClick={addLobby} className="optButts"> Create Game</button>
+                </li>
+                <li>
+                    <button onClick={finding} className="optButts">Join Game</button>
+                </li>
+            </ul>
 
         </>
     )

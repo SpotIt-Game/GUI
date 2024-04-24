@@ -134,7 +134,7 @@ function Potato(){
             if(index + 1 == pNum){
                 return(
                     <li>
-                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
+                        <Card scaler={0.6} gallery={current} num = {index} onButtonClick={verificador}></Card>
                         <p className='player'> Player Card </p>                 
                     </li>
                 )
@@ -142,7 +142,7 @@ function Potato(){
             else{
                 return(
                     <li>
-                        <Card gallery={current} num = {index} onButtonClick={verificador}></Card>
+                        <Card scaler={0.6} gallery={current} num = {index} onButtonClick={verificador}></Card>
                     </li>
                 )
             }
